@@ -1,0 +1,232 @@
+<?php
+
+$conn = mysqli_connect("localhost", "root", "", "php_crud");
+
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
+
+?>
+  =====================insert.php====================
+<?php
+include "database.php";
+
+if (isset($_POST['submit'])) {
+
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $password = $_POST['password'];
+
+    $query = "INSERT INTO users (name, email, phone, password)
+              VALUES ('$name', '$email', '$phone', '$password')";
+
+    if (mysqli_query($conn, $query)) {
+        header("Location: index.php");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add User</title>
+</head>
+<body>
+
+<h2>Add User</h2>
+
+<form method="POST">
+
+    Name:
+    <input type="text" name="name" required>
+    <br><br>
+
+    Email:
+    <input type="email" name="email" required>
+    <br><br>
+
+    Phone:
+    <input type="text" name="phone" required>
+    <br><br>
+
+    Password:
+    <input type="password" name="password" required>
+    <br><br>
+
+    <button type="submit" name="submit">Add User</button>
+
+</form>
+
+</body>
+</html>
+==========================show.php==========================
+<?php
+include "connection.php";
+
+$query = "SELECT * FROM users";
+$result = mysqli_query($conn, $query);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User CRUD</title>
+</head>
+<body>
+
+<h2>User List</h2>
+
+<a href="insert.php">Add New User</a>
+
+<br><br>
+
+<table border="1" cellpadding="10">
+
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+
+    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+
+    <tr>
+
+        <td><?php echo $row['id']; ?></td>
+
+        <td><?php echo $row['name']; ?></td>
+
+        <td><?php echo $row['email']; ?></td>
+
+        <td><?php echo $row['phone']; ?></td>
+
+        <td>
+            <a href="edit.php?id=<?php echo $row['id']; ?>">
+                Edit
+            </a>
+        </td>
+        <td>
+            <a href="delete.php?id=<?php echo $row['id']; ?>">
+                Delete
+            </a>
+        </td>
+
+    </tr>
+
+    <?php } ?>
+
+</table>
+
+</body>
+</html>
+=====================edit.php============================
+<?php
+include "connection.php";
+
+if (isset($_GET['id'])) {
+
+    $id = $_GET['id'];
+
+    $query = "SELECT * FROM users WHERE id = $id";
+    $result = mysqli_query($conn, $query);
+
+    $row = mysqli_fetch_assoc($result);
+}
+
+if (isset($_POST['update'])) {
+
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+
+    $query = "UPDATE users SET
+              name='$name',
+              email='$email',
+              phone='$phone',
+              WHERE id=$id";
+
+    if (mysqli_query($conn, $query)) {
+
+        header("Location: index.php");
+        exit;
+
+    } else {
+
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User</title>
+</head>
+<body>
+
+<h2>Edit User</h2>
+
+<form method="POST">
+
+    <input type="hidden" name="id"
+           value="<?php echo $row['id']; ?>">
+
+    Name:
+    <input type="text" name="name"
+           value="<?php echo $row['name']; ?>" required>
+
+    <br><br>
+
+    Email:
+    <input type="email" name="email"
+           value="<?php echo $row['email']; ?>" required>
+
+    <br><br>
+
+    Phone:
+    <input type="text" name="phone"
+           value="<?php echo $row['phone']; ?>" required>
+
+    <br><br>
+
+    <button type="submit" name="update">
+        Update User
+    </button>
+
+</form>
+
+</body>
+</html>
+===================delete.php=========================
+<?php
+include"connection.php";
+
+if(isset($_GET['id'])){
+	
+	$id = $_GET['id'];
+	$dlt = isset($_GET['dlt']) ? $_GET['dlt'] : "";
+	
+	if($dlt == "yes"){
+		$sql = "DELETE FROM student WHERE id='$id'";
+		$result = mysqli_query($conn,$sql);
+		header("Location:show.php");
+		exit();
+	}elseif($dlt == "no"){
+		header("Location:show.php");
+		exit();
+	}
+}
+?>
+<form method="GET">
+	<input type="hidden" name="id" value="<?php echo $id; ?>">
+    <button type="submit" name="dlt" value="yes">Delete</button>
+    <button type="submit" name="dlt" value="no">Cancel</button>
+</form>
