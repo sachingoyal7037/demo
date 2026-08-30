@@ -1,4 +1,3 @@
-========================database.php===========================
  
 <?php
 
@@ -259,4 +258,13 @@ session_destroy();
 header("Location: login.php");
 exit();
 
+?>
+======================================time_duration============================
+<?php
+$login = new DateTime("10:00:00");
+$logout = new DateTime("12:30:00");
+
+$duration = $login->diff($logout);
+
+echo $duration->format("%h hours %i minutes");
 ?>
